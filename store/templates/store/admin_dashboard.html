@@ -1,0 +1,299 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Executive Analytics | FurnitureLux Admin</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <style>
+        :root {
+            --lux-gold: #c5a059;
+            --lux-dark: #121212;
+            --lux-beige: #f9f6f2;
+            --lux-grey: #6c757d;
+            --lux-card-bg: #ffffff;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--lux-beige);
+            color: var(--lux-dark);
+            padding-bottom: 50px;
+        }
+
+        h2, h4, .card-title {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+        }
+
+        /* --- DASHBOARD HEADER --- */
+        .admin-header {
+            padding: 40px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            margin-bottom: 40px;
+            background: #fff;
+        }
+
+        /* --- METRIC CARDS --- */
+        .stat-card {
+            border: none;
+            border-radius: 0;
+            background: var(--lux-card-bg);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.05) !important;
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--lux-gold);
+        }
+
+        .stat-label {
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.75rem;
+            color: var(--lux-grey);
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--lux-dark);
+        }
+
+        /* --- CHART SECTION --- */
+        .chart-container {
+            background: #fff;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.02);
+            margin-top: 40px;
+        }
+
+        #salesChart {
+            max-width: 100%;
+            height: 350px !important;
+        }
+
+        /* --- LOW STOCK TABLE --- */
+        .alert-panel {
+            background: #fff;
+            padding: 30px;
+            margin-top: 40px;
+        }
+
+        .table {
+            border-collapse: separate;
+            border-spacing: 0 10px;
+        }
+
+        .table thead th {
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            letter-spacing: 1.5px;
+            border: none;
+            color: var(--lux-grey);
+            padding-bottom: 20px;
+        }
+
+        .table tbody tr {
+            background-color: var(--lux-beige);
+            transition: 0.3s;
+        }
+
+        .table tbody td {
+            padding: 20px;
+            border: none;
+            vertical-align: middle;
+        }
+
+        .stock-badge {
+            background: #ffeded;
+            color: #d9534f;
+            padding: 5px 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .btn-lux-sm {
+            background: var(--lux-dark);
+            color: white;
+            border-radius: 0;
+            padding: 10px 25px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.3s;
+            text-decoration: none;
+        }
+
+        .btn-lux-sm:hover {
+            background: var(--lux-gold);
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="admin-header">
+    <div class="container d-flex justify-content-between align-items-center">
+        <div>
+            <h6 class="text-uppercase ls-2 text-muted mb-1">Internal Operations</h6>
+            <h2 class="mb-0">FurnitureLux Analytics</h2>
+        </div>
+        <a href="{% url 'home' %}" class="btn-lux-sm">View Storefront</a>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card stat-card p-4 shadow-sm">
+                <div class="stat-label">Total Revenue</div>
+                <div class="stat-value">₹{{ total_sales }}</div>
+                <div class="small text-success mt-2"><i class="bi bi-graph-up-arrow"></i> Performance Index</div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card stat-card p-4 shadow-sm">
+                <div class="stat-label">Total Volume</div>
+                <div class="stat-value">{{ total_orders }} <span class="fs-6 fw-normal text-muted">Orders</span></div>
+                <div class="small text-muted mt-2">Lifetime Transaction Count</div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card stat-card p-4 shadow-sm">
+                <div class="stat-label">Action Required</div>
+                <div class="stat-value text-danger">{{ pending_orders }}</div>
+                <div class="small text-muted mt-2">Pending Fulfillment</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="chart-container">
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <h4 class="mb-0">Monthly Revenue Stream</h4>
+            <div class="small text-muted text-uppercase ls-1">Financial Year 2026</div>
+        </div>
+        <canvas id="salesChart"></canvas>
+    </div>
+
+    <div class="alert-panel">
+        <div class="d-flex align-items-center mb-4">
+            <i class="bi bi-exclamation-triangle text-warning me-3 fs-3"></i>
+            <h4 class="mb-0">Low Stock Alerts</h4>
+        </div>
+
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th style="width: 70%;">Product Identity</th>
+                    <th class="text-end">Current Inventory</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in low_stock_products %}
+                <tr>
+                    <td>
+                        <span class="fw-bold">{{ product.name }}</span>
+                        <div class="small text-muted">SKU: {{ product.id|stringformat:"05d" }}</div>
+                    </td>
+                    <td class="text-end">
+                        <span class="stock-badge">{{ product.stock }} Left</span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="2" class="text-center py-5 text-muted italic">Inventory levels are currently optimal across all categories.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // Set global Chart.js defaults for premium look
+    Chart.defaults.font.family = "'Poppins', sans-serif";
+    Chart.defaults.color = '#6c757d';
+
+    const data = JSON.parse('{{ monthly_sales|escapejs }}');
+    const labels = data.map(item => item.month);
+    const totals = data.map(item => item.total);
+
+    const ctx = document.getElementById('salesChart').getContext('2d');
+    
+    // Create gradient for the line chart
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, 'rgba(197, 160, 89, 0.2)');
+    gradient.addColorStop(1, 'rgba(197, 160, 89, 0)');
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Monthly Revenue (₹)',
+                data: totals,
+                borderColor: '#c5a059',
+                backgroundColor: gradient,
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4, // Smooth curves
+                pointBackgroundColor: '#fff',
+                pointBorderColor: '#c5a059',
+                pointHoverRadius: 6,
+                pointRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false // Cleaner look without legend
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        drawBorder: false,
+                        color: 'rgba(0,0,0,0.03)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

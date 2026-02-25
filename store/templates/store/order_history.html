@@ -1,0 +1,252 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order History | FurnitureLux</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poppins:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --lux-gold: #c5a059;
+            --lux-dark: #121212;
+            --lux-beige: #f9f6f2;
+            --lux-grey: #6c757d;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--lux-beige);
+            color: var(--lux-dark);
+            min-height: 100vh;
+        }
+
+        h1, h2, h3, h4, .navbar-brand {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* --- NAVIGATION --- */
+        .navbar {
+            background-color: #fff !important;
+            padding: 1rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--lux-dark) !important;
+        }
+
+        /* --- HEADER --- */
+        .history-header {
+            padding: 60px 0 40px;
+        }
+
+        /* --- ORDER CARD --- */
+        .order-card {
+            background: white;
+            border: none;
+            border-radius: 0;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+            overflow: hidden;
+            transition: 0.3s;
+        }
+
+        .order-card:hover {
+            box-shadow: 0 15px 40px rgba(0,0,0,0.05);
+        }
+
+        .order-card-header {
+            padding: 20px 30px;
+            background-color: #fff;
+            border-bottom: 1px solid #f5f5f5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .order-id-pill {
+            background: var(--lux-dark);
+            color: white;
+            padding: 5px 15px;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* --- PRODUCT ITEM --- */
+        .order-body {
+            padding: 30px;
+        }
+
+        .product-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #f9f9f9;
+        }
+
+        .product-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .order-img-wrapper {
+            width: 80px;
+            height: 100px;
+            background: var(--lux-beige);
+            overflow: hidden;
+        }
+
+        .order-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .item-info h6 {
+            margin-bottom: 5px;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        /* --- PREMIUM STATUS TRACKING BADGES --- */
+        .tracking-badge {
+            padding: 8px 18px;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+            border-radius: 0;
+            display: inline-block;
+        }
+
+        /* Status Colors mapped to tracking logic */
+        .bg-pending { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+        .bg-packed { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .bg-shipped { background-color: #cce5ff; color: #004085; border: 1px solid #b8daff; }
+        .bg-out { background-color: #e2e3e5; color: #383d41; border: 1px solid #d6d8db; }
+        .bg-delivered { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+
+        .order-total {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .empty-state {
+            padding: 100px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'home' %}">FURNITURELUX</a>
+        <div class="ms-auto">
+            <a href="{% url 'home' %}" class="btn btn-sm btn-outline-dark rounded-0 px-3">Home</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="history-header text-center">
+        <h6 class="text-uppercase ls-2 text-muted mb-2">Account Portal</h6>
+        <h2 class="display-5">Your Order History</h2>
+        <p class="text-muted italic">Tracking your artisanal journey with us.</p>
+    </div>
+
+    <div class="row justify-content-center pb-5">
+        <div class="col-lg-10">
+            
+            {% if orders %}
+                {% for order in orders %}
+                <div class="card order-card">
+                    <div class="order-card-header">
+                        <div>
+                            <span class="order-id-pill">Order #{{ order.id }}</span>
+                            <span class="ms-3 text-muted small"><i class="bi bi-calendar3 me-1"></i> {{ order.created_at|date:"M d, Y" }}</span>
+                        </div>
+                        
+                        <div>
+                            <span class="tracking-badge 
+                                {% if order.status == 'Pending' %} bg-pending
+                                {% elif order.status == 'Packed' %} bg-packed
+                                {% elif order.status == 'Shipped' %} bg-shipped
+                                {% elif order.status == 'Out for Delivery' %} bg-out
+                                {% elif order.status == 'Delivered' %} bg-delivered
+                                {% endif %}">
+                                <i class="bi bi-truck me-1"></i> {{ order.status }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="order-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                {% for item in order.items.all %}
+                                <div class="product-item">
+                                    <div class="order-img-wrapper shadow-sm">
+                                        {% if item.product.image %}
+                                            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+                                        {% else %}
+                                            <img src="https://via.placeholder.com/80x100" alt="placeholder">
+                                        {% endif %}
+                                    </div>
+                                    <div class="item-info">
+                                        <h6 class="text-uppercase">{{ item.product.name }}</h6>
+                                        <p class="text-muted small mb-0">Qty: {{ item.quantity }} | Category: {{ item.product.category.name }}</p>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                    <p class="small text-muted italic">Items details summarized below.</p>
+                                {% endfor %}
+                            </div>
+                            
+                            <div class="col-md-4 text-md-end border-start-md">
+                                <p class="text-muted small text-uppercase mb-1">Grand Total Paid</p>
+                                <div class="order-total">₹{{ order.total_price }}</div>
+                                
+                                <a href="{% url 'invoice' order.id %}" class="btn btn-link text-dark text-decoration-none small p-0 mt-3 text-uppercase ls-1">
+                                    View Details <i class="bi bi-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i class="bi bi-receipt-cutoff display-1 text-muted opacity-25"></i>
+                    <h3 class="mt-4">No Orders Found</h3>
+                    <p class="text-muted mb-4">You haven't placed any orders with us yet.</p>
+                    <a href="{% url 'home' %}" class="btn btn-dark rounded-0 px-5 py-3 text-uppercase ls-2">Start Shopping</a>
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+
+<footer class="py-5 text-center mt-auto">
+    <hr class="opacity-10 mb-5">
+    <p class="small text-muted text-uppercase ls-1">© 2026 FurnitureLux • Designed for Aesthetic Excellence</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

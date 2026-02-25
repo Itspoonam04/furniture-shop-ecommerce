@@ -1,0 +1,305 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ product.name }} | FurnitureLux</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poppins:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --lux-gold: #c5a059;
+            --lux-dark: #121212;
+            --lux-beige: #f9f6f2;
+            --lux-grey: #6c757d;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #ffffff;
+            color: var(--lux-dark);
+        }
+
+        h1, h2, h3, h4, .navbar-brand {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* --- NAVIGATION --- */
+        .navbar {
+            background-color: #fff !important;
+            padding: 1rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--lux-dark) !important;
+        }
+
+        /* --- PRODUCT DISPLAY --- */
+        .product-container {
+            margin-top: 80px;
+            margin-bottom: 100px;
+        }
+
+        .product-image-container {
+            background-color: var(--lux-beige);
+            padding: 40px;
+            text-align: center;
+            position: sticky;
+            top: 120px;
+        }
+
+        .main-product-img {
+            max-width: 100%;
+            height: auto;
+            mix-blend-mode: multiply;
+            transition: transform 0.5s ease;
+        }
+
+        .main-product-img:hover {
+            transform: scale(1.05);
+        }
+
+        /* --- DETAILS SECTION --- */
+        .category-label {
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-size: 0.8rem;
+            color: var(--lux-gold);
+            font-weight: 600;
+            display: block;
+            margin-bottom: 15px;
+        }
+
+        .product-title {
+            font-size: 3rem;
+            line-height: 1.1;
+            margin-bottom: 20px;
+        }
+
+        .price-tag {
+            font-size: 2rem;
+            font-weight: 400;
+            margin-bottom: 30px;
+        }
+
+        .description-text {
+            color: var(--lux-grey);
+            font-weight: 300;
+            line-height: 1.8;
+            margin-bottom: 40px;
+        }
+
+        /* --- ACTION BUTTONS --- */
+        .action-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .btn-lux-main {
+            background-color: var(--lux-dark);
+            color: white;
+            border-radius: 0;
+            padding: 18px 40px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-size: 0.8rem;
+            border: 1px solid var(--lux-dark);
+            transition: 0.4s;
+            flex-grow: 1;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .btn-lux-main:hover {
+            background-color: var(--lux-gold);
+            border-color: var(--lux-gold);
+            color: white;
+        }
+
+        .btn-lux-outline {
+            background-color: transparent;
+            color: var(--lux-dark);
+            border-radius: 0;
+            padding: 18px 40px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-size: 0.8rem;
+            border: 1px solid var(--lux-dark);
+            transition: 0.4s;
+            flex-grow: 1;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .btn-lux-outline:hover {
+            background-color: var(--lux-dark);
+            color: white;
+        }
+
+        /* Out of Stock Button Style */
+        .btn-lux-disabled {
+            background-color: #e0e0e0;
+            color: #999;
+            border-radius: 0;
+            padding: 18px 40px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-size: 0.8rem;
+            border: 1px solid #e0e0e0;
+            flex-grow: 1;
+            cursor: not-allowed;
+        }
+
+        .btn-wishlist {
+            background: transparent;
+            border: 1px solid #ddd;
+            width: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: 0.3s;
+            text-decoration: none;
+        }
+
+        .btn-wishlist:hover {
+            border-color: var(--lux-dark);
+            color: #ff4d4d;
+        }
+
+        /* --- META INFO --- */
+        .meta-info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 0.9rem;
+        }
+
+        .meta-label {
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+            font-weight: 600;
+            color: var(--lux-grey);
+        }
+
+        .stock-indicator {
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'home' %}">FURNITURELUX</a>
+        <div class="ms-auto">
+            <a href="{% url 'cart' %}" class="text-dark"><i class="bi bi-bag fs-5"></i></a>
+        </div>
+    </div>
+</nav>
+
+<div class="container product-container">
+    <div class="row g-5">
+        
+        <div class="col-lg-7">
+            <div class="product-image-container">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" class="main-product-img" alt="{{ product.name }}">
+                {% else %}
+                    <img src="https://via.placeholder.com/600x600?text=Premium+Furniture" class="main-product-img">
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <span class="category-label">{{ product.category.name }}</span>
+            <h1 class="product-title">{{ product.name }}</h1>
+            <div class="price-tag">₹{{ product.price }}</div>
+
+            <p class="description-text">
+                {{ product.description }}
+            </p>
+
+            <div class="mb-4">
+                {% if product.stock > 0 %}
+                <span class="stock-indicator text-success">
+                    <i class="bi bi-check-circle-fill"></i> In Stock: {{ product.stock }}
+                </span>
+                {% else %}
+                <span class="stock-indicator text-danger">
+                    <i class="bi bi-x-circle-fill"></i> Out of Stock
+                </span>
+                {% endif %}
+            </div>
+
+            <div class="action-group">
+                {% if product.stock > 0 %}
+                    <a href="{% url 'add_to_cart' product.id %}" class="btn btn-lux-main">
+                        Add to Cart
+                    </a>
+                    <a href="{% url 'checkout' %}" class="btn btn-lux-outline">
+                        Buy Now
+                    </a>
+                {% else %}
+                    <button class="btn btn-lux-disabled" disabled>
+                        Out of Stock
+                    </button>
+                {% endif %}
+                
+                <a href="{% url 'add_to_wishlist' product.id %}" class="btn btn-wishlist" title="Add to Wishlist">
+                    <i class="bi bi-heart"></i>
+                </a>
+            </div>
+
+            <div class="mt-5">
+                <div class="meta-info-item">
+                    <span class="meta-label">Material</span>
+                    <span>Solid Oak & Hand-woven Fabric</span>
+                </div>
+                <div class="meta-info-item">
+                    <span class="meta-label">Dimensions</span>
+                    <span>H 80cm x W 120cm x D 60cm</span>
+                </div>
+                <div class="meta-info-item">
+                    <span class="meta-label">Shipping</span>
+                    <span>Complimentary White Glove Delivery</span>
+                </div>
+                <div class="meta-info-item border-0">
+                    <span class="meta-label">Returns</span>
+                    <span>30-Day Aesthetic Guarantee</span>
+                </div>
+            </div>
+
+            <div class="mt-5 pt-4 border-top">
+                <p class="small text-muted"><i class="bi bi-shield-lock me-2"></i> Secured and encrypted transaction</p>
+                <p class="small text-muted"><i class="bi bi-truck me-2"></i> Free delivery on orders over ₹50,000</p>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<footer class="py-5 text-center bg-white border-top">
+    <p class="small text-muted text-uppercase ls-2">FURNITURELUX ATELIER • 2026</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

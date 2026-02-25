@@ -1,0 +1,347 @@
+<!-- {% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Your Cart</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+<div class="container mt-5">
+    <h2>Your Shopping Cart</h2>
+
+    {% if cart_items %}
+
+    <table class="table mt-4">
+        <thead>
+            <tr>
+                <th>Image</th>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+
+        <tbody>
+        {% for item in cart_items %}
+          
+            <tr>
+    <td>
+        {% if item.product.image %}
+            <img src="{{ item.product.image.url }}" width="80">
+        {% endif %}
+    </td>
+    <td>{{ item.product.name }}</td>
+    <td>₹{{ item.product.price }}</td>
+    
+     <td>
+    <a href="{% url 'decrease_quantity' item.id %}" class="btn btn-sm btn-outline-dark">-</a>
+    {{ item.quantity }}
+    <a href="{% url 'increase_quantity' item.id %}" class="btn btn-sm btn-outline-dark">+</a>
+</td>
+    
+     <td>₹{{ item.product.price|floatformat:2 }}</td>
+<td>₹{{ item.product.price|floatformat:2|add:item.quantity }}</td>
+
+    <td>
+        <a href="{% url 'remove_from_cart' item.id %}"
+           class="btn btn-danger btn-sm">
+           Remove
+        </a>
+    </td>
+</tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <h4>Total Price: ₹{{ total_price }}</h4>
+
+   <a href="{% url 'checkout' %}" class="btn btn-success">
+    Proceed to Checkout
+</a>
+
+    {% else %}
+        <h4>Your cart is empty.</h4>
+    {% endif %}
+</div>
+
+</body>
+</html> -->
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Bag | FurnitureLux</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poppins:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --lux-gold: #c5a059;
+            --lux-dark: #121212;
+            --lux-beige: #f9f6f2;
+            --lux-grey: #6c757d;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #ffffff;
+            color: var(--lux-dark);
+        }
+
+        h1, h2, h3, h4, .navbar-brand {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* --- NAVIGATION --- */
+        .navbar {
+            background-color: #fff !important;
+            padding: 1rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--lux-dark) !important;
+        }
+
+        /* --- CART LAYOUT --- */
+        .cart-header {
+            padding: 60px 0 40px;
+            text-align: center;
+        }
+
+        .cart-table thead {
+            background-color: var(--lux-beige);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+        }
+
+        .cart-table th {
+            padding: 20px;
+            border: none;
+            font-weight: 600;
+        }
+
+        .cart-table td {
+            padding: 30px 20px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .product-img {
+            width: 100px;
+            height: 120px;
+            object-fit: cover;
+            background-color: var(--lux-beige);
+        }
+
+        .product-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            text-decoration: none;
+            color: var(--lux-dark);
+            display: block;
+        }
+
+        /* --- QUANTITY CONTROLS --- */
+        .qty-wrapper {
+            display: inline-flex;
+            align-items: center;
+            border: 1px solid #e0e0e0;
+            padding: 5px;
+        }
+
+        .qty-btn {
+            color: var(--lux-dark);
+            text-decoration: none;
+            padding: 0 12px;
+            font-size: 1.2rem;
+            transition: 0.3s;
+        }
+
+        .qty-btn:hover { color: var(--lux-gold); }
+
+        .qty-count {
+            width: 40px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        /* --- SUMMARY PANEL --- */
+        .summary-card {
+            background-color: var(--lux-beige);
+            padding: 40px;
+            border-radius: 0;
+            border: none;
+        }
+
+        .summary-title {
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.9rem;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .btn-checkout {
+            background-color: var(--lux-dark);
+            color: white;
+            border-radius: 0;
+            padding: 15px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-size: 0.8rem;
+            width: 100%;
+            transition: 0.4s;
+            border: none;
+            margin-top: 20px;
+        }
+
+        .btn-checkout:hover {
+            background-color: var(--lux-gold);
+            color: white;
+        }
+
+        .remove-link {
+            color: #999;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .remove-link:hover { color: #ff4d4d; }
+    </style>
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'home' %}">FURNITURELUX</a>
+    </div>
+</nav>
+
+<div class="container mb-5">
+    <div class="cart-header">
+        <h6 class="text-uppercase ls-5 text-muted mb-2">Review Your Selection</h6>
+        <h2 class="display-5">Shopping Bag</h2>
+    </div>
+
+    {% if cart_items %}
+    <div class="row g-5">
+        <div class="col-lg-8">
+            <table class="table cart-table">
+                <thead>
+                    <tr>
+                        <th colspan="2">Product Details</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th class="text-end">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in cart_items %}
+                    <tr>
+                        <td style="width: 120px;">
+                            {% if item.product.image %}
+                                <img src="{{ item.product.image.url }}" class="product-img shadow-sm" alt="{{ item.product.name }}">
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'product_detail' item.product.id %}" class="product-name mb-1">
+                                {{ item.product.name }}
+                            </a>
+                            <span class="text-muted small text-uppercase">{{ item.product.category.name }}</span>
+                            <div class="mt-2">
+                                <a href="{% url 'remove_from_cart' item.id %}" class="remove-link">
+                                    <i class="bi bi-trash3 me-1"></i> Remove Item
+                                </a>
+                            </div>
+                        </td>
+                        <td>₹{{ item.product.price }}</td>
+                        <td>
+                            <div class="qty-wrapper">
+                                <a href="{% url 'decrease_quantity' item.id %}" class="qty-btn">-</a>
+                                <span class="qty-count">{{ item.quantity }}</span>
+                                <a href="{% url 'increase_quantity' item.id %}" class="qty-btn">+</a>
+                            </div>
+                        </td>
+                        <td class="text-end fw-bold">
+                            ₹{{ item.get_total_item_price }} 
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            <a href="{% url 'home' %}" class="text-decoration-none text-dark small mt-4 d-inline-block text-uppercase ls-2">
+                <i class="bi bi-arrow-left me-2"></i> Continue Exploring
+            </a>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="summary-card">
+                <h6 class="summary-title">Order Summary</h6>
+                
+                <div class="d-flex justify-content-between mb-3 fw-light">
+                    <span>Subtotal</span>
+                    <span>₹{{ total_price }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-3 fw-light">
+                    <span>Shipping</span>
+                    <span class="text-success small uppercase">Complimentary</span>
+                </div>
+                <div class="d-flex justify-content-between mb-4 fw-light">
+                    <span>Estimated Tax</span>
+                    <span>₹0.00</span>
+                </div>
+                
+                <hr>
+                
+                <div class="d-flex justify-content-between mb-4 mt-4">
+                    <span class="h5 mb-0">Total</span>
+                    <span class="h5 mb-0">₹{{ total_price }}</span>
+                </div>
+
+                <a href="{% url 'checkout' %}" class="btn btn-checkout">
+                    Secure Checkout
+                </a>
+
+                <div class="mt-4 text-center">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/2560px-Visa_Inc._logo.svg.png" height="15" class="mx-2 opacity-50">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1280px-Mastercard-logo.svg.png" height="15" class="mx-2 opacity-50">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-bag-x display-1 text-muted opacity-25"></i>
+        <h3 class="mt-4 fw-light">Your bag is currently empty.</h3>
+        <p class="text-muted">Discover our latest collection to find the perfect piece for your home.</p>
+        <a href="{% url 'home' %}" class="btn btn-dark rounded-0 px-5 py-3 mt-4 text-uppercase ls-2">Start Shopping</a>
+    </div>
+    {% endif %}
+</div>
+
+<footer class="py-5 text-center bg-white border-top mt-5">
+    <p class="small text-muted text-uppercase ls-2">FURNITURELUX ATELIER • 2026</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

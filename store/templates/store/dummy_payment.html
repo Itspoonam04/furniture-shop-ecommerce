@@ -1,0 +1,46 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Secure Payment | FurnitureLux</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        :root { --lux-gold: #c5a059; --lux-dark: #121212; --lux-beige: #f9f6f2; }
+        body { background-color: var(--lux-beige); font-family: 'Poppins', sans-serif; height: 100vh; display: flex; align-items: center; }
+        .payment-card { background: white; padding: 50px; border-radius: 0; box-shadow: 0 20px 60px rgba(0,0,0,0.05); max-width: 500px; width: 100%; margin: auto; }
+        .btn-pay { background: var(--lux-dark); color: white; border-radius: 0; padding: 15px; width: 100%; letter-spacing: 2px; text-transform: uppercase; border: none; transition: 0.3s; }
+        .btn-pay:hover { background: var(--lux-gold); }
+    </style>
+</head>
+<body>
+    <div class="payment-card text-center">
+        <h2 class="mb-4" style="font-family: 'Playfair Display';">Secure Payment</h2>
+        <p class="text-muted mb-4">You are paying for Order <strong>#{{ order.id }}</strong></p>
+        
+        <div class="p-4 mb-4" style="background: var(--lux-beige);">
+            <span class="text-muted d-block small mb-1">Total Payable Amount</span>
+            <h1 class="display-6 fw-bold">₹{{ order.total_price }}</h1>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="text-start mb-4">
+                <label class="small text-muted text-uppercase mb-2 d-block">Simulated Card Details</label>
+                <input type="text" class="form-control mb-2 rounded-0" placeholder="XXXX XXXX XXXX 1234" disabled>
+                <div class="row">
+                    <div class="col-6"><input type="text" class="form-control rounded-0" placeholder="MM/YY" disabled></div>
+                    <div class="col-6"><input type="text" class="form-control rounded-0" placeholder="CVV" disabled></div>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn-pay">Pay Now & Confirm Order</button>
+        </form>
+        
+        <div class="mt-4 small text-muted">
+            <i class="bi bi-shield-lock-fill"></i> SSL Encrypted Connection
+        </div>
+    </div>
+</body>
+</html>

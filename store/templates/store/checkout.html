@@ -1,0 +1,268 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout | FurnitureLux</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poppins:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --lux-gold: #c5a059;
+            --lux-dark: #121212;
+            --lux-beige: #f9f6f2;
+            --lux-grey: #6c757d;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--lux-beige);
+            color: var(--lux-dark);
+        }
+
+        h1, h2, h3, h4, .navbar-brand {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* --- NAVIGATION --- */
+        .navbar {
+            background-color: #fff !important;
+            padding: 1rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--lux-dark) !important;
+        }
+
+        /* --- CHECKOUT CARD --- */
+        .checkout-container {
+            margin-top: 60px;
+            margin-bottom: 100px;
+        }
+
+        .checkout-card {
+            background: white;
+            border: none;
+            border-radius: 0;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.03);
+            overflow: hidden;
+        }
+
+        /* --- FORM STYLING --- */
+        .form-section {
+            padding: 40px;
+        }
+
+        label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--lux-grey);
+        }
+
+        .form-control {
+            border-radius: 0;
+            border: 1px solid #e1e1e1;
+            padding: 15px;
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--lux-gold);
+            box-shadow: none;
+        }
+
+        /* --- SUMMARY SECTION --- */
+        .summary-section {
+            background-color: #fcfcfc;
+            border-left: 1px solid #eee;
+            padding: 40px;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-weight: 300;
+            font-size: 0.95rem;
+        }
+
+        .gst-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-weight: 400;
+            color: var(--lux-grey);
+            font-size: 0.9rem;
+            font-style: italic;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 1px solid #eee;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--lux-dark);
+        }
+
+        .btn-place-order {
+            background: var(--lux-dark);
+            color: white;
+            border: none;
+            border-radius: 0;
+            padding: 18px;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-size: 0.8rem;
+            transition: 0.4s;
+            margin-top: 30px;
+        }
+
+        .btn-place-order:hover {
+            background: var(--lux-gold);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* --- PROGRESS BAR --- */
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+            gap: 20px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .step-indicator .active {
+            color: var(--lux-gold);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'home' %}">FURNITURELUX</a>
+    </div>
+</nav>
+
+<div class="container checkout-container">
+    
+    <div class="step-indicator">
+        <span class="text-muted">01 Bag</span>
+        <span class="text-muted"><i class="bi bi-chevron-right"></i></span>
+        <span class="active">02 Checkout</span>
+        <span class="text-muted"><i class="bi bi-chevron-right"></i></span>
+        <span class="text-muted">03 Confirmation</span>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card checkout-card">
+                <div class="row g-0">
+                    
+                    <div class="col-md-7 form-section">
+                        <h3 class="mb-4">Shipping Information</h3>
+                        
+                        <form method="POST" id="checkoutForm">
+                            {% csrf_token %}
+
+                            <div class="mb-4">
+                                <label for="address">Delivery Address</label>
+                                <textarea name="address" id="address" class="form-control" rows="4" placeholder="House No., Street, City, Pincode..." required></textarea>
+                            </div>
+
+                            <div class="mb-4">
+                                <label>Payment Method</label>
+                                <div class="p-3 border d-flex justify-content-between align-items-center">
+                                    <span><i class="bi bi-cash-coin me-2"></i> Cash on Delivery</span>
+                                    <i class="bi bi-check-circle-fill text-success"></i>
+                                </div>
+                                <small class="text-muted d-block mt-2">More payment options coming soon.</small>
+                            </div>
+
+                            <button type="submit" class="btn btn-place-order">
+                                Place Order
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="col-md-5 summary-section">
+                        <h4 class="mb-4">Order Summary</h4>
+                        
+                        <div class="price-row">
+                            <span>Subtotal</span>
+                            <span>₹{{ total_price }}</span>
+                        </div>
+                        
+                        <div class="gst-row">
+                            <span>GST (Dynamic)</span>
+                            <span>₹{{ total_gst }}</span>
+                        </div>
+
+                        <div class="price-row">
+                            <span>Shipping</span>
+                            <span class="text-success small text-uppercase fw-bold">Free</span>
+                        </div>
+
+                        <div class="mt-4 mb-3 pt-3 border-top">
+                            <label class="small text-uppercase ls-1">Promotional Code</label>
+                            <form method="GET" class="input-group">
+                                <input type="text" name="coupon" class="form-control rounded-0 border-0 border-bottom bg-transparent px-0" placeholder="Enter Coupon Code" value="{{ request.GET.coupon }}">
+                                <button class="btn btn-sm btn-outline-dark rounded-0 border-0 border-bottom text-uppercase ls-1" type="submit">Apply</button>
+                            </form>
+                        </div>
+
+                        {% if discount_amount > 0 %}
+                        <div class="price-row text-success fw-bold">
+                            <span>Discount Amount</span>
+                            <span>- ₹{{ discount_amount }}</span>
+                        </div>
+                        {% endif %}
+
+                        <div class="total-row">
+                            <span>Final Total</span>
+                            <span>₹{{ final_total }}</span>
+                        </div>
+
+                        <div class="mt-5 pt-4 border-top">
+                            <p class="small text-muted mb-2"><i class="bi bi-receipt me-2"></i> Official GST Invoice will be provided</p>
+                            <p class="small text-muted mb-2"><i class="bi bi-shield-check me-2"></i> Secure Transaction</p>
+                            <p class="small text-muted"><i class="bi bi-arrow-counterclockwise me-2"></i> 30-Day Aesthetic Guarantee</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <a href="{% url 'cart' %}" class="text-decoration-none text-muted small uppercase ls-1">
+                    <i class="bi bi-arrow-left me-1"></i> Return to Shopping Bag
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

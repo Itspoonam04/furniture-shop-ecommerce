@@ -1,0 +1,201 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Invoice_{{ order.id }} | FurnitureLux</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 0;
+        }
+        body {
+            font-family: 'Helvetica Neue', 'Helvetica', sans-serif;
+            color: #121212;
+            line-height: 1.6;
+            padding: 0;
+            margin: 0;
+            background: #fff;
+        }
+        .invoice-wrapper {
+            padding: 60px;
+            max-width: 800px;
+            margin: auto;
+        }
+
+        /* --- HEADER --- */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 80px;
+            border-bottom: 2px solid #121212;
+            padding-bottom: 30px;
+        }
+        .brand-name {
+            font-family: 'Times New Roman', serif;
+            font-size: 28px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+        }
+        .invoice-title {
+            text-align: right;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #c5a059; /* FurnitureLux Gold */
+            font-size: 14px;
+        }
+
+        /* --- INFO SECTIONS --- */
+        .info-grid {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 60px;
+            font-size: 13px;
+        }
+        .info-block h6 {
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 0 0 10px 0;
+            color: #6c757d;
+            font-size: 11px;
+        }
+        .info-block p {
+            margin: 0;
+            font-weight: 500;
+        }
+
+        /* --- TABLE STYLE --- */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 50px;
+        }
+        th {
+            text-align: left;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 2px;
+            padding: 15px 0;
+            border-bottom: 1px solid #121212;
+            color: #6c757d;
+        }
+        td {
+            padding: 20px 0;
+            border-bottom: 1px solid #f2f2f2;
+            font-size: 14px;
+        }
+        .text-right { text-align: right; }
+
+        /* --- TOTALS --- */
+        .totals-section {
+            display: flex;
+            justify-content: flex-end;
+        }
+        .totals-table {
+            width: 250px;
+        }
+        .totals-table tr td {
+            padding: 10px 0;
+            border: none;
+        }
+        .grand-total {
+            border-top: 1px solid #121212 !important;
+            font-size: 18px !important;
+            font-weight: bold;
+            padding-top: 20px !important;
+        }
+
+        /* --- FOOTER --- */
+        .footer {
+            margin-top: 100px;
+            font-size: 10px;
+            color: #999;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="invoice-wrapper">
+    <div class="header">
+        <div class="brand-name">FurnitureLux</div>
+        <div class="invoice-title">
+            Tax Invoice / Bill of Supply<br>
+            <span style="color:#121212">#{{ order.id }}</span>
+        </div>
+    </div>
+
+    <div class="info-grid">
+        <div class="info-block">
+            <h6>Billed To</h6>
+            <p>{{ order.user.get_full_name|default:order.user.username }}</p>
+            <p style="color:#6c757d; font-weight: 400; width: 200px;">{{ order.address }}</p>
+        </div>
+        <div class="info-block" style="text-align: right;">
+            <h6>Seller Details</h6>
+            <p>FurnitureLux Atelier Pvt Ltd.</p>
+            <p>GSTIN: 27ABCDE1234F1Z5</p>
+            <p>Date: {{ order.created_at|date:"d/m/Y" }}</p>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 50%;">Product Description</th>
+                <th class="text-right">Qty</th>
+                <th class="text-right">Unit Price</th>
+                <th class="text-right">GST %</th>
+                <th class="text-right">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td>
+                    <span style="font-weight: 600;">{{ item.product.name }}</span><br>
+                    <small style="color:#999; font-size: 11px;">Category: {{ item.product.category.name }}</small>
+                </td>
+                <td class="text-right">{{ item.quantity }}</td>
+                <td class="text-right">₹{{ item.product.price }}</td>
+                <td class="text-right">{{ item.product.gst_percentage|default:"18" }}%</td>
+                <td class="text-right">₹{{ item.get_total_item_price }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="totals-section">
+        <table class="totals-table">
+            <tr>
+                <td style="color:#6c757d;">Subtotal</td>
+                <td class="text-right">₹{{ total_price }}</td>
+            </tr>
+            <tr>
+                <td style="color:#6c757d;">Tax (GST)</td>
+                <td class="text-right">₹{{ total_gst }}</td>
+            </tr>
+            <tr>
+                <td style="color:#6c757d;">Shipping</td>
+                <td class="text-right text-success">Complimentary</td>
+            </tr>
+            <tr class="grand-total">
+                <td>Grand Total</td>
+                <td class="text-right">₹{{ grand_total }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="footer">
+        Thank you for choosing FurnitureLux. This is a computer-generated document. No signature required.
+        <br>
+        <span style="margin-top: 10px; display: block;">Luxury Design • Sustainable Craftsmanship • Timeless Quality</span>
+    </div>
+</div>
+
+</body>
+</html>
